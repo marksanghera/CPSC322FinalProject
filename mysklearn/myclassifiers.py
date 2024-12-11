@@ -381,6 +381,15 @@ class MyDecisionTreeClassifier:
         return y_predicted
 
     def tdidt_predict(self, tree, instance):
+        """Makes a prediction for a single instance.
+        
+        Args:
+            tree: The decision tree
+            instance: The instance to classify
+            
+        Returns:
+            The predicted class label (True or False)
+        """
         # base case: we are at a leaf node and can return the class prediction
         info_type = tree[0]  # "Leaf" or "Attribute"
         if info_type == "Leaf":
@@ -393,7 +402,14 @@ class MyDecisionTreeClassifier:
             value_list = tree[i]
             # do we have a match with instance for this attribute?
             if value_list[1] == instance[att_index]:
-                return self.tdidt_predict(value_list[2], instance)
+                prediction = self.tdidt_predict(value_list[2], instance)
+                if prediction is not None:
+                    return prediction
+    
+        # If we get here, we didn't find a matching value or got a None prediction
+        # Make a random choice between True and False
+        import random
+        return random.choice([True, False])
 
     def print_decision_rules(self, attribute_names=None, class_name="class"):
         """Prints the decision rules from the tree in the format
