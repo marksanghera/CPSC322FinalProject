@@ -12,6 +12,7 @@ from mysklearn.myutils import tdidt, get_attribute_domains
 
 from mysklearn.mysimplelinearregressor import MySimpleLinearRegressor
 import numpy as np
+import random
 
 class MySimpleLinearRegressionClassifier:
     """Represents a simple linear regression classifier that discretizes
@@ -464,3 +465,78 @@ class MyDecisionTreeClassifier:
             You will need to install graphviz in the Docker container as shown in class to complete this method.
         """
         pass # TODO: (BONUS) fix this
+
+class MyRandomForestClassifier:
+    """Represents a random forest classifier.
+
+    Attributes:
+        n_trees(int): The number of trees in the forest.
+        trees(list of MyDecisionTreeClassifier): The list of decision tree classifiers.
+        max_features(int): The number of features to consider when looking for the best split.
+    """
+
+    def __init__(self, n_trees=10, max_features=None, bootstrap_sample_size=None):
+        """Initializer for MyRandomForestClassifier.
+
+        Args:
+            n_trees(int): The number of trees in the forest.
+            max_features(int): The number of features to consider when looking for the best split.
+                If None, use sqrt(number of features).
+        """
+        self.n_trees = n_trees # Number of trees in the forest (n)
+        self.trees = []
+        self.max_features = max_features # Max features to consider at each split (f)
+        self.bootstrap_sample_size = bootstrap_sample_size  # Number of samples per tree's bootstrap sample (m)
+
+    def fit(self, X_train, y_train):
+        """Fits the random forest classifier to X_train and y_train.
+
+        Args:
+            X_train(list of list of obj): The list of training instances (samples).
+                The shape of X_train is (n_train_samples, n_features).
+            y_train(list of obj): The target y values (parallel to X_train).
+                The shape of y_train is n_train_samples.
+        """
+        n_features = len(X_train[0])  # Number of features in the dataset
+        if self.max_features is None:
+            # Default to sqrt(number of features) if not specified
+            self.max_features = int(n_features ** 0.5)
+        
+        # Default bootstrap sample size to the training set size if not specified
+        if self.bootstrap_sample_size is None:
+            self.bootstrap_sample_size = len(X_train)
+
+        for _ in range(self.n_trees):
+            # Create a bootstrap sample (random sampling with replacement)
+            bootstrap_indices = [random.randint(0, len(X_train) - 1) for _ in range(self.bootstrap_sample_size)]
+            X_bootstrap = [X_train[i] for i in bootstrap_indices]  # Sampled training features (m samples per tree)
+            y_bootstrap = [y_train[i] for i in bootstrap_indices]  # Sampled training labels
+
+            # Train a decision tree on the bootstrap sample
+            tree = MyDecisionTreeClassifier()
+            tree.fit(X_bootstrap, y_bootstrap)  # Fit the decision tree
+            self.trees.append(tree)  # Add the trained tree to the forest
+
+    def predict(self, X_test):
+        """Makes predictions for test instances in X_test.
+
+        Args:
+            X_test(list of list of obj): The list of testing samples.
+                The shape of X_test is (n_test_samples, n_features).
+
+        Returns:
+            y_predicted(list of obj): The predicted target y values (parallel to X_test).
+        """
+        # Collect predictions from all trees
+        predictions = []  # List to store predictions from all trees
+        for tree in self.trees:
+            predictions.append(tree.predict(X_test))  # Get predictions from each tree
+        # Aggregate predictions (majority vote)
+        y_predicted = []  # Final list of predicted labels
+        for i in range(len(X_test)):
+            votes = [predictions[j][i] for j in range(self.n_trees)]  # Collect votes for instance i
+            unique, counts = np.unique(votes, return_counts=True)  # Count occurrences of each label
+            most_common_label = unique[np.argmax(counts)]  # Find the label with the most votes
+            y_predicted.append(most_common_label)  # Append the majority vote to predictions
+
+        return y_predicted
