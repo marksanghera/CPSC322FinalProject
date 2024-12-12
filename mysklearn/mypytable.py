@@ -204,7 +204,7 @@ class MyPyTable:
                 for should be ignored.
             Assumes col_names only contains the names of columns with numeric data.
         """
-        stats_table = MyPyTable(["attribute", "min", "max", "avg", "median"])
+        stats_table = MyPyTable(["attribute", "min", "max","mid", "avg", "median"])
         
         def calculate_median(data):
             sorted_data = sorted(data)

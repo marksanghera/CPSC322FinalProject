@@ -22,13 +22,14 @@ def calculate_frequencies(column_data):
             frequencies[index] += 1
     return unique_values, frequencies
 
-def plot_frequency_diagram(attribute, column_data):
+def plot_discretized_frequency_diagram(attribute, column_data, label):
     unique_values, frequencies = calculate_frequencies(column_data)
     plt.bar(unique_values, frequencies)
     plt.title(f"Total Number by {attribute}")
     plt.xlabel(attribute)
     plt.ylabel("Count")
     plt.xticks(rotation=0)
+    plt.text(-0.1, -0.1, label, fontsize=12, ha='center', transform=plt.gca().transAxes)
     plt.show()
 
 def discretize_mpg_doe(mpg_values):
@@ -84,13 +85,14 @@ def plot_frequency_diagram(attribute, categories, labels=None):
     plt.show()
 
 
-def plot_histogram(attribute, column_data, bins=10):
+def plot_histogram(attribute, column_data, label, bins=10):
     column_data = [float(value) for value in column_data if value != 'NA']
     
     plt.hist(column_data, bins=bins, edgecolor = 'black')
     plt.title(f"Distribution of {attribute} Values")
     plt.xlabel(attribute)
     plt.ylabel("Count")
+    plt.text(-0.1, -0.1, label, fontsize=12, ha='center', transform=plt.gca().transAxes)
     plt.show()
 
 
@@ -123,7 +125,7 @@ def filter_valid_pairs(x, y):
             valid_y.append(yi)
     return valid_x, valid_y
 
-def plot_scatter_with_regression(x, y, x_label, y_label):
+def plot_scatter_with_regression(x, y, x_label, y_label, label):
     """Plot a scatter plot with a manually calculated regression line and correlation coefficient."""
     x, y = filter_valid_pairs(x, y)
     
@@ -138,6 +140,7 @@ def plot_scatter_with_regression(x, y, x_label, y_label):
     plt.title(f"{x_label.capitalize()} vs {y_label.lower()}")
     plt.xlabel(x_label.capitalize())
     plt.ylabel(y_label.capitalize())
+    plt.text(-0.1, -0.1, label, fontsize=12, ha='center', transform=plt.gca().transAxes)
     plt.annotate(f"r={correlation_coef:.2f}", xy=(0.05, 0.95), xycoords='axes fraction',
                  fontsize=12, color='red', bbox=dict(boxstyle="round,pad=0.3", edgecolor='red', facecolor='white'))
 
